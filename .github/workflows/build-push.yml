@@ -3,6 +3,10 @@ name: Build and Publish Image
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - "src/**"
+      - "Dockerfile"
+      - "entrypoint.sh"
 
 permissions:
   contents: read
