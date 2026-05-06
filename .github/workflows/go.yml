@@ -3,6 +3,10 @@ name: Go
 on:
   pull_request:
     branches: ["main"]
+    paths:
+      - "src/*"
+      - "Dockerfile"
+      - "entrypoint.sh"
 
 jobs:
   build:
