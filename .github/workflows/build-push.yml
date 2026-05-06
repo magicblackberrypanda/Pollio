@@ -1,0 +1,47 @@
+name: Build and Publish Image
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (optional, for multi-arch)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to registry
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile                        # change if Dockerfile in subdir
+          platforms: linux/amd64                    # add other platforms if needed
+          push: true
+          tags: |
+            pollio:${{ github.sha }}
+            pollio:latest
+
+      - name: Output pushed image
+        run: echo "Pushed $IMAGE with tags $GITHUB_SHA and latest"
+        env:
+          IMAGE: ${{ env.IMAGE }}
+          GITHUB_SHA: ${{ github.sha }}
