@@ -18,9 +18,9 @@ services:
 channels:
   main:
     type: "telegram"
-    success_notification: "%service% is up and running!"
-    error_notification: "%service% is down because of %error%!"
+    success_notification: "{{.service}} is up and running!"
+    error_notification: "{{.service}} is down because of {{.error}}!"
   secondary:
     type: "telegram"
-    success_notification: "%service% is up and running!"
-    error_notification: "%service% is down because of %error%!"
+    success_notification: "{{.service}} is [up]!"
+    error_notification: "{{.service}} is down because of {{.error}}!"
