@@ -1,0 +1,26 @@
+services:
+  google:
+    fqdn: https://google.com
+    timeout_s: 5
+    retries: 2
+    method: curl
+    interval: "@1m"
+    channels:
+      - main
+      - secondary
+  youtube:
+    fqdn: https://google.com
+    timeout_s: 3
+    retries: 1
+    method: curl
+    interval: "@2m"
+
+channels:
+  main:
+    type: "telegram"
+    success_notification: "%service% is up and running!"
+    error_notification: "%service% is down because of %error%!"
+  secondary:
+    type: "telegram"
+    success_notification: "%service% is up and running!"
+    error_notification: "%service% is down because of %error%!"
