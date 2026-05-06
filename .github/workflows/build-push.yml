@@ -9,6 +9,10 @@ permissions:
   packages: write
   id-token: write
 
+env:
+  IMAGE: docker.io/magicblackberrypanda/pollio
+  REGISTRY_HOST: docker.io
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -25,7 +29,7 @@ jobs:
       - name: Log in to registry
         uses: docker/login-action@v3
         with:
-          registry: docker.io
+          registry: ${{ env.REGISTRY_HOST }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
@@ -33,12 +37,12 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile                        # change if Dockerfile in subdir
-          platforms: linux/amd64                    # add other platforms if needed
+          file: ./Dockerfile
+          platforms: linux/amd64
           push: true
           tags: |
-            pollio:${{ github.sha }}
-            pollio:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
 
       - name: Output pushed image
         run: echo "Pushed $IMAGE with tags $GITHUB_SHA and latest"
