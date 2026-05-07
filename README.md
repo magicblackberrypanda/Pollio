@@ -13,8 +13,8 @@ The image is very small (~7 MB) but fully capable for its purpose. 🚀
 
 Pollio needs only a config file and envs required by a specific channel type. Configuration consists of following sections:
 
-- [services](#services)
-- [channels](#services)
+- [services](#services) (Mandatory)
+- [channels](#services) (Optional)
 
 > Exmaples also available in [here](./examples/config_with_channels.yaml)
 
@@ -121,6 +121,13 @@ Now simply run:
 ```sh
 docker compose up -d
 ```
+
+## Monitoring
+
+Pollio has two ways of monitoring service availability:
+
+- Notification channels (see [channels](#channels))
+- REST API (see [API endoints](./docs/api.md))
 
 ## Work in progress
 
