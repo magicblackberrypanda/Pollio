@@ -4,9 +4,6 @@ A lightweight polling service written in Go with GitOps-style configuration. Pol
 
 The image is very small (~7 MB) but fully capable for its purpose. 🚀
 
-## Table of Contents
-
-
 ## How to run?
 
 1. ⚙️ [Configure](#configuration) via one config 
@@ -124,3 +121,7 @@ Now simply run:
 ```sh
 docker compose up -d
 ```
+
+## Work in progress
+
+To see what features are in-progress/requested or if you want to request a new feature, please visit [issues](https://github.com/magicblackberrypanda/Pollio/issues).
