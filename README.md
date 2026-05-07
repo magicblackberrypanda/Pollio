@@ -112,7 +112,6 @@ services:
     container_name: pollio
     image: magicblackberrypanda/pollio:latest
     environment:
-      # Env forwarding from .env file (real values only available in .env and not visible in git)
       - CHANNEL_YOUR_CHANNEL_NAME_TG_BOT_TOKEN=${CHANNEL_YOUR_CHANNEL_NAME_TG_BOT_TOKEN}
       - CHANNEL_YOUR_CHANNEL_NAME_TG_CHAT_ID=${CHANNEL_YOUR_CHANNEL_NAME_TG_CHAT_ID}
       - CHANNEL_YOUR_ANOTHER_CHANNEL_NAME_TG_BOT_TOKEN=${CHANNEL_YOUR_ANOTHER_CHANNEL_NAME_TG_BOT_TOKEN}
@@ -120,6 +119,12 @@ services:
     volumes:
       - path/to/your/config.yaml:/pollio/config/services.yaml
     restart: unless-stopped
+    deploy:
+        limits:
+          memory: 32M        # safe upper bound (configure based on your usage)
+        reservations:
+          cpus: '0.01'       # reserve minimal CPU
+          memory: 16M        # reserve enough for normal operation
 ```
 
 Now simply run:
