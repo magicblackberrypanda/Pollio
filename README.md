@@ -20,7 +20,7 @@ The image is very small (~7 MB) but fully capable for its purpose. 🚀
 Pollio needs only a config file and envs required by a specific channel type. Configuration consists of following sections:
 
 - [services](#services) (Mandatory)
-- [channels](#services) (Optional)
+- [channels](#services) (Optional, see [monitoring docs](#monitoring))
 
 > Exmaples also available in [here](./examples/config_with_channels.yaml)
 
