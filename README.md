@@ -59,8 +59,7 @@ Fields:
 
 ### Channels
 
-Now, channels are needed for pollers to broadcast the output, hence if one of your services is down/up,
-channels are the way to let one be notified about the event. Channel can be defined as:
+Now, channels are needed for pollers to broadcast the output; if one of your services is down/up, channels notify about the event. Channel can be defined as:
 
 ```yaml
 channels:
@@ -71,11 +70,11 @@ channels:
 ```
 
 Fields:
-
 - **your_channel**: logical channel name.
 - **type**: channel provider (see supported types).
 - **success_notification**: template for success messages (Go text/template syntax).
 - **error_notification**: template for error messages (Go text/template syntax).
+- Available template fields: **service**, **error**.
 
 Each channel type requires credentials passed via environment variables. Env names are unique per channel and derived from the channel name.
 
