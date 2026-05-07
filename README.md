@@ -4,6 +4,12 @@ A lightweight polling service written in Go with GitOps-style configuration. Pol
 
 The image is very small (~7 MB) but fully capable for its purpose. 🚀
 
+![Image Build (main)](https://github.com/magicblackberrypanda/Pollio/actions/workflows/build-push.yml/badge.svg)
+![License](https://img.shields.io/github/license/magicblackberrypanda/Pollio)
+![Issues](https://img.shields.io/github/issues/magicblackberrypanda/Pollio)
+![Pull Requests](https://img.shields.io/github/issues-pr/magicblackberrypanda/Pollio)
+![Code size](https://img.shields.io/github/languages/code-size/magicblackberrypanda/Pollio)
+
 ## How to run?
 
 1. ⚙️ [Configure](#configuration) via one config 
