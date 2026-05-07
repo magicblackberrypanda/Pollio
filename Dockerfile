@@ -39,5 +39,8 @@ ENV POLLIO_SERVICES_FILE="/pollio/config/services.yaml"
 # ensure entrypoint runs with sh
 ENTRYPOINT ["sh", "/usr/local/bin/entrypoint.sh"]
 
+# Expose api endpoint port
+EXPOSE 8080
+
 # run as non-root
 USER pollio
