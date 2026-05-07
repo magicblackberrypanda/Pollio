@@ -9,6 +9,11 @@ The image is very small (~7 MB) but fully capable for its purpose. 🚀
 
 ## How to run?
 
+1. ⚙️ [Configure](#configuration) via one config 
+2. 🐳 [Deploy](#deployment) via docker compose
+
+## Configuration
+
 Pollio needs only a config file and envs required by a specific channel type. Configuration consists of following sections:
 
 - [services](#services)
@@ -93,3 +98,29 @@ Supported types:
   - `CHANNEL_YOUR_CHANNEL_TG_BOT_TOKEN`
   - `CHANNEL_YOUR_CHANNEL_TG_CHAT_ID`
 </details>
+
+## Deployment
+
+Use the docker compose to deploy Pollio:
+
+```yaml
+services:
+  pollio:
+    container_name: pollio
+    image: magicblackberrypanda/pollio:latest
+    environment:
+      # Env forwarding from .env file (real values only available in .env and not visible in git)
+      - CHANNEL_YOUR_CHANNEL_NAME_TG_BOT_TOKEN=${CHANNEL_YOUR_CHANNEL_NAME_TG_BOT_TOKEN}
+      - CHANNEL_YOUR_CHANNEL_NAME_TG_CHAT_ID=${CHANNEL_YOUR_CHANNEL_NAME_TG_CHAT_ID}
+      - CHANNEL_YOUR_ANOTHER_CHANNEL_NAME_TG_BOT_TOKEN=${CHANNEL_YOUR_ANOTHER_CHANNEL_NAME_TG_BOT_TOKEN}
+      - CHANNEL_YOUR_ANOTHER_CHANNEL_NAME_TG_CHAT_ID=${CHANNEL_YOUR_ANOTHER_CHANNEL_NAME_TG_CHAT_ID}
+    volumes:
+      - path/to/your/config.yaml:/pollio/config/services.yaml
+    restart: unless-stopped
+```
+
+Now simply run:
+
+```sh
+docker compose up -d
+```
