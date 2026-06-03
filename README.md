@@ -35,7 +35,12 @@ services:
     timeout_s: 3
     retries: 1
     method: curl
-    interval: "@2m" # valid: "@1m", "@5h", "@1d" or "30s"
+    interval: "@2m"
+    maintenance_period:
+      repeat: "weekly"
+      starting_day: "Monday"
+      starting_time: "03:00"
+      duration: "@1h"
     channels:
       - "your_channel"
 ```
@@ -47,7 +52,12 @@ Fields:
 - **timeout_s**: request timeout in seconds.
 - **retries**: number of retry attempts on failure.
 - **method**: poll method, out of [supported methods]()
-- **interval**: poll interval — human-friendly format or seconds (examples above).
+- **interval**: poll interval — human-friendly format or seconds ("@1m", "@5h", "@1d", or plain durations like "30s").
+- **maintenance_period**: period when service will not be polled. (optional)
+  - **repeat**: repeating cycle [one of: "daily", "weekly", "monthly" (or a combined string like "monthly/weekly/daily")]
+  - **starting_day**: required for weekly/monthly repeats; weekday name (case-insensitive)
+  - **starting_time**: time when period starts
+  - **duration**: how long the period is taking (same format as interval)
 - **channels**: list of channel names to notify on status changes.
 
 #### Supported poll methods

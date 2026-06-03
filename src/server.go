@@ -88,6 +88,17 @@ func (s *Server) startPoller(name string, sc ServiceConfig, parentCtx context.Co
 	} else {
 		debugf("starting poller for %s every %s", name, interval)
 	}
+	if (sc.MaintenancePeriod != nil) {
+		m := *sc.MaintenancePeriod
+		debugf(
+			"Noting the maintenance period for %s: [Repeated %s, starting from %s %s and lasting for %s]",
+			name,
+			m.Repeat,
+			m.StartingDay,
+			m.StartingTime,
+			m.Duration,
+		)
+	}
 
 	go func() {
 		for {
@@ -97,20 +108,26 @@ func (s *Server) startPoller(name string, sc ServiceConfig, parentCtx context.Co
 				return
 			default:
 			}
-			debugf("polling %s -> %s", name, sc.FQDN)
-			res := s.pingService(sc)
-			res.Timestamp = time.Now().UTC()
-			if res.OK != s.results[name].OK { 
-				s.mu.Lock()
-				s.results[name] = res
-				if s.notifier != nil && len(sc.Channels) > 0 {
-					go s.notifier.NotifyForServiceState(name, res, sc.Channels)
-				}
-				s.mu.Unlock()
-				infof("result for %s: ok=%v status=%d attempts=%d err=%q dur_ms=%d",
-					name, res.OK, res.StatusCode, res.Attempts, res.Error, res.DurationMs)
+			now := time.Now().UTC()
+			if inMaintenanceWindow(sc.MaintenancePeriod, now) {
+				debugf("skipping polling %s during maintenance window", name)
+				//TODO: set a "maintenance" result; otherwise leave previous state unchanged
 			} else {
-				infof("result same for %s [OK: %v]", name, res.OK)
+				debugf("polling %s -> %s", name, sc.FQDN)
+				res := s.pingService(sc)
+				res.Timestamp = now
+				if res.OK != s.results[name].OK {
+					s.mu.Lock()
+					s.results[name] = res
+					if s.notifier != nil && len(sc.Channels) > 0 {
+						go s.notifier.NotifyForServiceState(name, res, sc.Channels)
+					}
+					s.mu.Unlock()
+					infof("result for %s: ok=%v status=%d attempts=%d err=%q dur_ms=%d",
+						name, res.OK, res.StatusCode, res.Attempts, res.Error, res.DurationMs)
+				} else {
+					infof("result same for %s [OK: %v]", name, res.OK)
+				}
 			}
 			select {
 			case <-time.After(interval):

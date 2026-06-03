@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 )
 
@@ -18,47 +16,6 @@ type Result struct {
 	Timestamp  time.Time `json:"timestamp"`
 	DurationMs int64     `json:"duration_ms"`
 	Attempts   int       `json:"attempts"`
-}
-
-// parseInterval accepts "@1m", "@5h", "@1d", or explicit durations like "30s".
-func parseInterval(s string) (time.Duration, error) {
-	s = strings.TrimSpace(s)
-	if s == "" {
-		return 0, errors.New("empty interval")
-	}
-	if strings.HasPrefix(s, "@") {
-		v := strings.TrimPrefix(s, "@")
-		if strings.HasSuffix(v, "m") || strings.HasSuffix(v, "h") || strings.HasSuffix(v, "d") {
-			unit := v[len(v)-1]
-			num := v[:len(v)-1]
-			n, err := strconv.Atoi(num)
-			if err != nil {
-				return 0, err
-			}
-			switch unit {
-			case 'm':
-				return time.Duration(n) * time.Minute, nil
-			case 'h':
-				return time.Duration(n) * time.Hour, nil
-			case 'd':
-				return time.Duration(n) * 24 * time.Hour, nil
-			default:
-				return 0, fmt.Errorf("unknown unit: %c", unit)
-			}
-		}
-		n, err := strconv.Atoi(v)
-		if err != nil {
-			return 0, err
-		}
-		return time.Duration(n) * time.Second, nil
-	}
-	if d, err := time.ParseDuration(s); err == nil {
-		return d, nil
-	}
-	if n, err := strconv.Atoi(s); err == nil {
-		return time.Duration(n) * time.Second, nil
-	}
-	return 0, fmt.Errorf("invalid interval: %s", s)
 }
 
 func (s *Server) pingService(sc ServiceConfig) Result {

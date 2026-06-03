@@ -5,6 +5,11 @@ services:
     retries: 2
     method: curl
     interval: "@1m"
+    maintenance_period: 
+      repeat: "daily"
+      starting_day: "Monday"
+      starting_time: "17:19"
+      duration: "@2m"
     channels:
       - main
       - secondary
