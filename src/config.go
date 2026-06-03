@@ -3,9 +3,15 @@ package main
 import (
 	"io"
 	"os"
-
 	"gopkg.in/yaml.v3"
 )
+
+type MaintenancePeriodConfig struct {
+	Repeat        string `yaml:"repeat"`
+	StartingDay   string `yaml:"starting_day"`
+	StartingTime  string `yaml:"starting_time"`
+	Duration      string `yaml:"duration"` // e.g. "@1m", "@5h", "@1d" or "30s"
+}
 
 type ServiceConfig struct {
 	FQDN     string `yaml:"fqdn"`
@@ -13,6 +19,7 @@ type ServiceConfig struct {
 	Retries  int    `yaml:"retries"`
 	Method   string `yaml:"method"`
 	Interval string `yaml:"interval"` // e.g. "@1m", "@5h", "@1d" or "30s"
+	MaintenancePeriod *MaintenancePeriodConfig `yaml:"maintenance_period,omitempty"`
 	Channels []string `yaml:"channels,omitempty"`
 }
 
