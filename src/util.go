@@ -7,28 +7,70 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"sync"
 )
 
+var (
+    tzOnce sync.Once
+    tzLoc  *time.Location
+    tzMu   sync.RWMutex
+)
+
+// SetTimezone sets the timezone used for timestamps.
+// Accepts an IANA name (e.g. "Europe/Moscow") or offset-style names via time.FixedZone.
+// Call once at startup; it's safe to call multiple times.
+func SetLoggerTimezone(name string) error {
+    loc, err := time.LoadLocation(name)
+    if err != nil {
+        // allow numeric offset like "UTC+3" or fall back to FixedZone parsing if you want
+        return err
+    }
+    tzMu.Lock()
+    tzLoc = loc
+    tzMu.Unlock()
+    return nil
+}
+
+func getTZ() *time.Location {
+    tzMu.RLock()
+    loc := tzLoc
+    tzMu.RUnlock()
+    if loc == nil {
+        tzOnce.Do(func() {
+            tzMu.Lock()
+            if tzLoc == nil {
+                tzLoc = time.UTC
+            }
+            tzMu.Unlock()
+        })
+        tzMu.RLock()
+        loc = tzLoc
+        tzMu.RUnlock()
+    }
+    return loc
+}
+
 func timestamp() string {
-	return time.Now().Format(time.RFC3339)
+    return time.Now().In(getTZ()).Format(time.RFC3339)
 }
 
 func debugf(format string, v ...any) {
-	fmt.Fprintf(os.Stderr, "%s [DEBUG] %s\n", timestamp(), fmt.Sprintf(format, v...))
+    fmt.Fprintf(os.Stderr, "%s [DEBUG] %s\n", timestamp(), fmt.Sprintf(format, v...))
 }
 
 func infof(format string, v ...any) {
-	fmt.Fprintf(os.Stderr, "%s [INFO] %s\n", timestamp(), fmt.Sprintf(format, v...))
+    fmt.Fprintf(os.Stderr, "%s [INFO] %s\n", timestamp(), fmt.Sprintf(format, v...))
 }
 
 func errorf(format string, v ...any) {
-	fmt.Fprintf(os.Stderr, "%s [ERROR] %s\n", timestamp(), fmt.Sprintf(format, v...))
-	os.Exit(1)
+    fmt.Fprintf(os.Stderr, "%s [ERROR] %s\n", timestamp(), fmt.Sprintf(format, v...))
+    os.Exit(1)
 }
 
 func warningf(format string, v ...any) {
-	fmt.Fprintf(os.Stderr, "%s [WARNING] %s\n", timestamp(), fmt.Sprintf(format, v...))
+    fmt.Fprintf(os.Stderr, "%s [WARNING] %s\n", timestamp(), fmt.Sprintf(format, v...))
 }
+
 
 // parseInterval accepts "@1m", "@5h", "@1d", or explicit durations like "30s".
 func parseInterval(s string) (time.Duration, error) {

@@ -1,8 +1,12 @@
+global:
+  timezone: "Europe/Berlin"
+
 services:
   google:
     fqdn: https://google.com
     timeout_s: 5
     retries: 2
+    retry_interval_s: 62
     method: curl
     interval: "@1m"
     maintenance_period: 

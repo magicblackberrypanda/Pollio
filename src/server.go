@@ -18,6 +18,7 @@ type Server struct {
 
 	pollerCancel map[string]context.CancelFunc
 	notifier *ChannelNotifier
+	timeLocation *time.Location
 }
 
 func newServer(cfgPath string) (*Server, error) {
@@ -30,6 +31,18 @@ func newServer(cfgPath string) (*Server, error) {
 	if len(cfg.Channels) > 0 {
 		debugf("Channels detected in config")
 		notifier = newChannelNotifier(cfg.Channels)
+	}
+	tz := cfg.Global.Timezone
+	loc, err := time.LoadLocation(tz)
+	if err != nil {
+		warningf("Supplied global.timezone is not supported: %s. Defaulting to UTC!", err)
+		loc = time.UTC
+	} else if tz == "" {
+		warningf("Supplied global.timezone can not be empty. Defaulting to UTC!")
+		loc = time.UTC
+	} else {
+		SetLoggerTimezone(tz)
+		infof("Timzone set to %s", tz)
 	}
 	transport := &http.Transport{
 		Proxy:                 http.ProxyFromEnvironment,
@@ -47,6 +60,7 @@ func newServer(cfgPath string) (*Server, error) {
 		httpClient:   client,
 		pollerCancel: make(map[string]context.CancelFunc),
 		notifier: notifier,
+		timeLocation: loc,
 	}
 	debugf("Server is created")
 	for name := range cfg.Services {
@@ -81,13 +95,16 @@ func (s *Server) startPoller(name string, sc ServiceConfig, parentCtx context.Co
 	s.pollerCancel[name] = cancel
 	s.mu.Unlock()
 
+	if sc.RetryIntervalSeconds <= 0 {
+		debugf("invalid retry_interval for %s (%d), defaulting to 1m", name, sc.RetryIntervalSeconds)
+		sc.RetryIntervalSeconds = 60
+	}
 	interval, err := parseInterval(sc.Interval)
 	if err != nil || interval <= 0 {
 		debugf("invalid interval for %s (%q), defaulting to 1m", name, sc.Interval)
 		interval = time.Minute
-	} else {
-		debugf("starting poller for %s every %s", name, interval)
 	}
+	debugf("starting poller for %s every %s, with retry interval of %ds", name, interval, sc.RetryIntervalSeconds)
 	if (sc.MaintenancePeriod != nil) {
 		m := *sc.MaintenancePeriod
 		debugf(
@@ -108,7 +125,7 @@ func (s *Server) startPoller(name string, sc ServiceConfig, parentCtx context.Co
 				return
 			default:
 			}
-			now := time.Now().UTC()
+			now := time.Now().In(s.timeLocation)
 			if inMaintenanceWindow(sc.MaintenancePeriod, now) {
 				debugf("skipping polling %s during maintenance window", name)
 				//TODO: set a "maintenance" result; otherwise leave previous state unchanged
