@@ -18,7 +18,8 @@ type ServiceConfig struct {
 	TimeoutS int    `yaml:"timeout_s"`
 	Retries  int    `yaml:"retries"`
 	Method   string `yaml:"method"`
-	Interval string `yaml:"interval"` // e.g. "@1m", "@5h", "@1d" or "30s"
+	Interval string `yaml:"interval"`
+	RetryIntervalSeconds int `yaml:"retry_interval_s"`
 	MaintenancePeriod *MaintenancePeriodConfig `yaml:"maintenance_period,omitempty"`
 	Channels []string `yaml:"channels,omitempty"`
 }
@@ -29,8 +30,13 @@ type ChannelConfig struct {
 	ErrorNotification   string `yaml:"error_notification"`
 }
 
+type GlobalConfig struct {
+	Timezone string `yaml:"timezone"`
+}
+
 type Config struct {
 	Services map[string]ServiceConfig `yaml:"services"`
+	Global GlobalConfig `yaml:"global"`
 	Channels map[string]ChannelConfig `yaml:"channels,omitempty"`
 }
 

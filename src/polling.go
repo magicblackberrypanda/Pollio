@@ -56,8 +56,8 @@ func (s *Server) pingService(sc ServiceConfig) Result {
 		cancel()
 		if err != nil {
 			lastErr = err
-			debugf("request error for %s: %v (attempt %d/%d)", sc.FQDN, err, attempt, maxAttempts)
-			time.Sleep(time.Duration(500*attempt) * time.Millisecond)
+			debugf("request error for %s: %v (attempt %d/%d). Next retry in %d seconds...", sc.FQDN, err, attempt, maxAttempts, sc.RetryIntervalSeconds)
+			time.Sleep(time.Duration(sc.RetryIntervalSeconds) * time.Second)
 			continue
 		}
 		statusCode = resp.StatusCode
@@ -73,8 +73,8 @@ func (s *Server) pingService(sc ServiceConfig) Result {
 			}
 		}
 		lastErr = errors.New(fmt.Sprintf("status %d", statusCode))
-		debugf("non-2xx for %s: %d (attempt %d/%d)", sc.FQDN, statusCode, attempt, maxAttempts)
-		time.Sleep(time.Duration(500*attempt) * time.Millisecond)
+		debugf("non-2xx for %s: %d (attempt %d/%d). Next retry in %d seconds...", sc.FQDN, statusCode, attempt, maxAttempts, sc.RetryIntervalSeconds)
+		time.Sleep(time.Duration(sc.RetryIntervalSeconds) * time.Second)
 	}
 	errStr := ""
 	if lastErr != nil {

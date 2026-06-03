@@ -1,0 +1,21 @@
+services:
+  pollio:
+    container_name: pollio
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - CHANNEL_YOUR_CHANNEL_NAME_TG_BOT_TOKEN=${CHANNEL_YOUR_CHANNEL_NAME_TG_BOT_TOKEN}
+      - CHANNEL_YOUR_CHANNEL_NAME_TG_CHAT_ID=${CHANNEL_YOUR_CHANNEL_NAME_TG_CHAT_ID}
+      - CHANNEL_YOUR_ANOTHER_CHANNEL_NAME_TG_BOT_TOKEN=${CHANNEL_YOUR_ANOTHER_CHANNEL_NAME_TG_BOT_TOKEN}
+      - CHANNEL_YOUR_ANOTHER_CHANNEL_NAME_TG_CHAT_ID=${CHANNEL_YOUR_ANOTHER_CHANNEL_NAME_TG_CHAT_ID}
+    volumes:
+      - ./examples/config_with_channels.yaml:/pollio/config/services.yaml:ro
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 32M        # safe upper bound (configure based on your usage)
+        reservations:
+          cpus: '0.01'       # reserve minimal CPU
+          memory: 16M        # reserve enough for normal operation

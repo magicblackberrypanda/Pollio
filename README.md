@@ -20,6 +20,7 @@ The image is very small (~7 MB) but fully capable for its purpose. 🚀
 Pollio needs only a config file and envs required by a specific channel type. Configuration consists of following sections:
 
 - [services](#services) (Mandatory)
+- [global](#global) (Optional)
 - [channels](#services) (Optional, see [monitoring docs](#monitoring))
 
 > Exmaples also available in [here](./examples/config_with_channels.yaml)
@@ -34,6 +35,7 @@ services:
     fqdn: https://example.com
     timeout_s: 3
     retries: 1
+    retry_interval_s: 300
     method: curl
     interval: "@2m"
     maintenance_period:
@@ -51,6 +53,7 @@ Fields:
 - **fqdn**: full URL or address to poll.
 - **timeout_s**: request timeout in seconds.
 - **retries**: number of retry attempts on failure.
+- **retry_interval_s**: time in seconds between retries. [optional, default: 60s]
 - **method**: poll method, out of [supported methods]()
 - **interval**: poll interval — human-friendly format or seconds ("@1m", "@5h", "@1d", or plain durations like "30s").
 - **maintenance_period**: period when service will not be polled. (optional)
@@ -66,6 +69,18 @@ Fields:
 - [ ] ping
 - [ ] TCP/UDP port
 - [ ] DNS
+
+### Global
+
+These are global settings applied to a whole instance. Can be defined as:
+
+```yaml
+global:
+  timezone: "Europe/Berlin"
+```
+
+Fields:
+- **timezone**: a timezone in which pollio will operate. Useful for correct `maintenance_period` timings.
 
 ### Channels
 
